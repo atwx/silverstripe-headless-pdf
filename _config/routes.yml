@@ -1,0 +1,9 @@
+---
+Name: pdfroutes
+After:
+  - '#rootroutes'
+  - '#coreroutes'
+---
+SilverStripe\Control\Director:
+  rules:
+    'pdf//$Action/$ID': 'Atwx\HeadlessPDF\Controllers\HeadlessPDFController'

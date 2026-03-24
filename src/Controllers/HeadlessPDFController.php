@@ -1,47 +1,67 @@
 <?php
 
-namespace ATWX\HeadlessPDF\Controllers;
+namespace Atwx\HeadlessPDF\Controllers;
 
-use ATWX\HeadlessPDF\Services\HeadlessPDFService;
 use SilverStripe\Control\Controller;
-use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Control\HTTPResponse;
+use SilverStripe\Core\Environment;
 
 /**
  * Controller that exposes an endpoint for generating PDFs from URLs.
  */
 class HeadlessPDFController extends Controller
 {
-    private static string $url_segment = 'headless-pdf';
+    private static string $url_segment = 'pdf';
 
     private static array $allowed_actions = [
-        'generate',
+        'renderPdfTemplate',
     ];
 
     /**
      * Generate a PDF for the given URL query parameter and stream it to the browser.
      */
-    public function generate(HTTPRequest $request): HTTPResponse
+    public function renderPdfTemplate()
     {
-        $url = $request->getVar('url');
+        $request = $this->getRequest();
 
-        if (!$url) {
-            return $this->httpError(400, 'Missing required "url" parameter.');
+        $hash = $request->getVar('hash');
+        $template = $request->getVar('template');
+        $className = $request->getVar('className');
+        $variation = $request->getVar('variation');
+
+        if (!$hash || !$template || !self::validateHash($hash, $template)) {
+            return $this->httpError(403, 'Invalid hash');
         }
 
-        try {
-            $pdfContent = HeadlessPDFService::create()->generateFromUrl($url);
-        } catch (\InvalidArgumentException $e) {
-            return $this->httpError(400, $e->getMessage());
-        } catch (\RuntimeException $e) {
-            return $this->httpError(500, 'PDF generation failed.');
+        if ($className || $variation) {
+            return $this->customise([
+                "TemplateObject" => $className::get()->byID($request->param('ID')),
+                "Variation" => $variation,
+            ])->renderWith($template);
+        } else {
+            return $this->renderWith($template);
         }
-
-        $response = HTTPResponse::create();
-        $response->addHeader('Content-Type', 'application/pdf');
-        $response->addHeader('Content-Disposition', 'inline; filename="document.pdf"');
-        $response->setBody($pdfContent);
-
-        return $response;
     }
+
+    /**
+     * Secure PDF generation with hashes
+     */
+    public static function generateHash(string $template): string
+    {
+        $hashKey = Environment::getEnv('HEADLESS_PDF_HASH_KEY');
+        if (!$hashKey) {
+            return Controller::curr()->httpError(403, 'Hash key not configured');
+        }
+        return hash_hmac('sha256', $template, $hashKey);
+    }
+
+    public static function validateHash(string $hash, string $template): bool
+    {
+        if (!$hash || !$template) {
+            return false;
+        }
+
+        $expectedHash = self::generateHash($template);
+        return hash_equals($expectedHash, $hash);
+    }
+
 }
