@@ -2,9 +2,8 @@
 
 namespace Atwx\HeadlessPDF\Services;
 
+use Exception;
 use HeadlessChromium\BrowserFactory;
-use HeadlessChromium\Page;
-use horstoeko\zugferd\ZugferdDocumentPdfMerger;
 use SilverStripe\Core\Environment;
 use SilverStripe\Core\Injector\Injectable;
 
@@ -34,7 +33,7 @@ class HeadlessPDFService
 
         try {
             $page = $browser->createPage();
-            $page->navigate($link)->waitForNavigation(Page::NETWORK_IDLE);
+            $page->navigate($link)->waitForNavigation();
 
             $defaultOptions = [
                 'landscape' => false,
@@ -55,8 +54,12 @@ class HeadlessPDFService
             $pdf->saveToFile($tempPath);
 
             if ($zugferdXml) {
-                $pdfMerger = new ZugferdDocumentPdfMerger($zugferdXml, $tempPath);
-                $pdfMerger->generateDocument()->saveDocument($tempPath);
+                if (!class_exists(\horstoeko\zugferd\ZugferdDocumentPdfMerger::class)) {
+                    throw new Exception("ZugferdDocumentPdfMerger class not found. Please make sure the horstoeko/zugferd library is installed.");
+                } else {
+                    $pdfMerger = new \horstoeko\zugferd\ZugferdDocumentPdfMerger($zugferdXml, $tempPath);
+                    $pdfMerger->generateDocument()->saveDocument($tempPath);
+                }
             }
 
             if ($getPath) {
