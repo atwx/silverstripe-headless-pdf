@@ -16,6 +16,8 @@ chrome-php/chrome: "^1.15"
 ```
 
 ## Configuration
+The browser-factory will search for the environment variable `CHROME_PATH` when starting. To prevent it from guessing this variable should be set in your `.env` ([configuration instruction from chrome-php/chrome](https://github.com/chrome-php/chrome?tab=readme-ov-file#using-different-chrome-executable)).
+
 This pdf module uses hashes created with the `sha256` algorithm for protecting the html. If you need this protection set the `HEADLESS_PDF_HASH_KEY` variable in your `.env` otherwise the hashing validation will be skipped. Any other authentication method has to be disabled for the `HeadlessPDFController->renderPdfTemplate` function.
 
 Additionally if you are using ddev you can set the `IS_DDEV` variable in your `.env` to `"true"`. By doing this sandboxing is disabled and certificate errors are ignored allowing printing PDFs locally. To use headless chrome in ddev you need the [headless chrome add-on](https://addons.ddev.com/addons/gebruederheitz/ddev-headless-chrome) by gebruederheitz.
