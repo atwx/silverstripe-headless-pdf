@@ -4,6 +4,7 @@ namespace Atwx\HeadlessPDF\Services;
 
 use Exception;
 use HeadlessChromium\BrowserFactory;
+use HeadlessChromium\Page;
 use SilverStripe\Core\Environment;
 use SilverStripe\Core\Injector\Injectable;
 
@@ -33,7 +34,9 @@ class HeadlessPDFService
 
         try {
             $page = $browser->createPage();
-            $page->navigate($link)->waitForNavigation();
+
+            $waitingMode = Environment::getEnv('WAITING_MODE') ?: 'networkIdle';
+            $page->navigate($link)->waitForNavigation($waitingMode);
 
             $defaultOptions = [
                 'landscape' => false,

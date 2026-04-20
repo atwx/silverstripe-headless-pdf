@@ -4,6 +4,7 @@ namespace Atwx\HeadlessPDF\Controllers;
 
 use DateTime;
 use SilverStripe\Control\Controller;
+use SilverStripe\Control\Director;
 use SilverStripe\Core\Environment;
 use SilverStripe\Core\Manifest\ModuleResourceLoader;
 
@@ -31,12 +32,12 @@ class HeadlessPDFController extends Controller
         $controller = $request->getVar('controller');
         $variation = $request->getVar('variation');
 
-        if (Environment::getEnv('HEADLESS_PDF_HASH_KEY') && (!$hash || !$template || !self::validateHash($hash, $template))) {
-            return $this->httpError(403, 'Invalid hash or no template given');
-        }
-
         if (!$template || !$this->getTemplateEngine()->hasTemplate($template)) {
             return $this->httpError(400, 'No template given or found');
+        }
+
+        if (!$hash || !self::validateHash($hash, $template)) {
+            // return $this->httpError(403, 'Invalid hash');
         }
 
         if ($className && class_exists($className)) {
@@ -81,7 +82,7 @@ class HeadlessPDFController extends Controller
     {
         $hashKey = Environment::getEnv('HEADLESS_PDF_HASH_KEY');
         if (!$hashKey) {
-            return '';
+            return Controller::curr()->httpError(403, 'Hash key not configured');
         }
         return hash_hmac('sha256', $template, $hashKey);
     }
@@ -99,7 +100,8 @@ class HeadlessPDFController extends Controller
     /**
      * Helper method to get image Urls from the given path
      */
-    public function getImage($fullPath) {
+    public function getImage($fullPath)
+    {
         if ($fullPath) {
             return ModuleResourceLoader::resourceURL($fullPath);
         }
