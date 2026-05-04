@@ -116,4 +116,16 @@ class HeadlessPDFController extends Controller
     {
         return (new DateTime($timezone = "Europe/Berlin"))->format("d.m.Y");
     }
+
+    /**
+     * Helper method to render a given date
+     */
+    public function renderDate($date = null)
+    {
+        if ($date) {
+            return date("d.m.Y", strtotime($date));
+        }
+
+        return null;
+    }
 }
