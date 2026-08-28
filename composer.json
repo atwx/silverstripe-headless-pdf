@@ -21,12 +21,12 @@
     },
     "autoload": {
         "psr-4": {
-            "ATWX\\HeadlessPDF\\": "src/"
+            "Atwx\\HeadlessPDF\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "ATWX\\HeadlessPDF\\Tests\\": "tests/php/"
+            "Atwx\\HeadlessPDF\\Tests\\": "tests/php/"
         }
     },
     "extra": {

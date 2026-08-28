@@ -36,8 +36,8 @@ class HeadlessPDFController extends Controller
             return $this->httpError(400, 'No template given or found');
         }
 
-        if (!$hash || !self::validateHash($hash, $template)) {
-            // return $this->httpError(403, 'Invalid hash');
+        if (!is_string($hash) || !self::validateHash($hash, $template)) {
+            return $this->httpError(403, 'Invalid hash');
         }
 
         if ($className && class_exists($className)) {
