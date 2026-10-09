@@ -24,6 +24,8 @@ This pdf module uses hashes created with the `sha256` algorithm for protecting t
 
 Additionally if you are using ddev you can set the `IS_DDEV` variable in your `.env` to `"true"`. By doing this sandboxing is disabled and certificate errors are ignored allowing printing PDFs locally. To use headless chrome in ddev you need the [headless chrome add-on](https://addons.ddev.com/addons/gebruederheitz/ddev-headless-chrome) by gebruederheitz.
 
+If Chrome fails to start on the server because the sandbox cannot be created (e.g. on Ubuntu 23.10+ where AppArmor blocks unprivileged user namespaces), set `CHROME_NO_SANDBOX` in your `.env` to `"true"` to disable sandboxing outside of ddev as well.
+
 
 ## Usage
 To print a pdf you need to create a new instance of `HeadlessPDFService` and call its `generatePdf` function. This function takes up to 5 arguments:

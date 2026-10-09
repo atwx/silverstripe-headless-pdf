@@ -28,7 +28,8 @@ class HeadlessPDFService
 
         $browser = $browserFactory->createBrowser([
             'startupTimeout' => 600,
-            'noSandbox' => $isDDev,
+            // CHROME_NO_SANDBOX: needed on hosts where AppArmor blocks unprivileged user namespaces (Ubuntu 23.10+)
+            'noSandbox' => $isDDev || filter_var(Environment::getEnv('CHROME_NO_SANDBOX'), FILTER_VALIDATE_BOOLEAN),
             'ignoreCertificateErrors' => $isDDev,
         ]);
 
