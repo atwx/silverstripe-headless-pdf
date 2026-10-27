@@ -46,6 +46,35 @@ calling the `HeadlessPDFController` with the following get-parameters:
 - optional `controller` to use an iterable list of dataobjects in the template callable as `$TemplateDatalist`. This list can be defined in a getPdfDatalist function in the given controller,
 - optional `variation` containing a string callable as `Variation` in the template to enable similar pdf versions without the need to create a new template.
 
+### Signed URLs (recommended)
+
+`HeadlessPDFController::signedUrl()` builds an expiring URL whose signature covers
+template, record ID, `className`, `controller` and `variation`, so none of them can
+be changed without invalidating the URL:
+
+```php
+$url = HeadlessPDFController::signedUrl(
+    'App\Pdf\Invoice',     // template
+    $invoice->ID,            // record ID (optional)
+    Invoice::class,          // className (optional)
+    null,                    // controller (optional)
+    null,                    // variation (optional)
+    300,                     // lifetime in seconds (default: signed_url_ttl)
+);
+$pdf = HeadlessPDFService::create()->generatePdf($url, 'invoice');
+```
+
+The legacy `hash` parameter only signs the template: anyone with a hash for a
+template can render any record through it. Disable it once all callers use
+`signedUrl()`:
+
+```yaml
+Atwx\HeadlessPDF\Controllers\HeadlessPDFController:
+  allow_template_only_hash: false
+```
+
+`className` must be a `DataObject` subclass and `controller` a `Controller` subclass.
+
 For the correct rendering of the pdf received as a string you need to set the two HTTP-headers
 ```
 $this->getResponse()->addHeader('Content-Type', 'application/pdf')
