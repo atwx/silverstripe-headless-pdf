@@ -24,7 +24,9 @@ class HeadlessPDFService
         $chromePath = Environment::getEnv('CHROME_PATH');
         $browserFactory = new BrowserFactory($chromePath ?: null);
 
-        $isDDev = Environment::getEnv('IS_DDEV') === 'true';
+        // ddev itself sets IS_DDEV_PROJECT; IS_DDEV is the older manual switch in .env
+        $isDDev = filter_var(Environment::getEnv('IS_DDEV'), FILTER_VALIDATE_BOOLEAN)
+            || filter_var(Environment::getEnv('IS_DDEV_PROJECT'), FILTER_VALIDATE_BOOLEAN);
 
         $browser = $browserFactory->createBrowser([
             'startupTimeout' => 600,

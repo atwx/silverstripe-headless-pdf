@@ -22,7 +22,7 @@ If the browser has trouble rendering the PDF (mostly timeouts), you can try diff
 
 This pdf module uses hashes created with the `sha256` algorithm for protecting the html. Therefore you need to set the `HEADLESS_PDF_HASH_KEY` variable in your `.env` otherwise the pdf creation return an 403 http error. Any other authentication method has to be disabled for the `HeadlessPDFController->renderPdfTemplate` function.
 
-Additionally if you are using ddev you can set the `IS_DDEV` variable in your `.env` to `"true"`. By doing this sandboxing is disabled and certificate errors are ignored allowing printing PDFs locally. To use headless chrome in ddev you need the [headless chrome add-on](https://addons.ddev.com/addons/gebruederheitz/ddev-headless-chrome) by gebruederheitz.
+Inside ddev the module detects the `IS_DDEV_PROJECT` variable that ddev sets in every container (setting `IS_DDEV` to `"true"` in your `.env` still works as well). In ddev sandboxing is disabled and certificate errors are ignored allowing printing PDFs locally. To use headless chrome in ddev you need the [headless chrome add-on](https://addons.ddev.com/addons/gebruederheitz/ddev-headless-chrome) by gebruederheitz.
 
 If Chrome fails to start on the server because the sandbox cannot be created (e.g. on Ubuntu 23.10+ where AppArmor blocks unprivileged user namespaces), set `CHROME_NO_SANDBOX` in your `.env` to `"true"` to disable sandboxing outside of ddev as well.
 
